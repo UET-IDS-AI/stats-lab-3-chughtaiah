@@ -1,9 +1,6 @@
 """
-Prob and Stats Lab – Discrete Probability Distributions
-
-Follow the instructions in each function carefully.
-DO NOT change function names.
-Use random_state=42 where required.
+AI Stats Lab – Discrete Probability Distributions
+Solved Version
 """
 
 import numpy as np
@@ -15,32 +12,40 @@ import math
 # =========================================================
 
 def card_experiment():
-    """
-    STEP 1: Consider a standard 52-card deck.
-            Assume 4 Aces.
+    total = 52
+    aces = 4
 
-    STEP 2: Compute analytically:
-            - P(A)
-            - P(B)
-            - P(B | A)
-            - P(A ∩ B)
+    # Analytical probabilities
+    P_A = aces / total
+    P_B = aces / total
+    P_B_given_A = (aces - 1) / (total - 1)
+    P_AB = P_A * P_B_given_A
 
-    STEP 3: Check independence:
-            P(A ∩ B) ?= P(A)P(B)
+    # Simulation
+    np.random.seed(42)
+    deck = np.arange(52)
+    ace_set = {0, 1, 2, 3}
 
-    STEP 4: Simulate 200,000 experiments
-            WITHOUT replacement.
-            Use random_state=42.
+    N = 200000
+    count_A = 0
+    count_AB = 0
 
-            Estimate:
-            - empirical P(A)
-            - empirical P(B | A)
+    for _ in range(N):
+        draw = np.random.choice(deck, 2, replace=False)
+        A = draw[0] in ace_set
+        B = draw[1] in ace_set
 
-    STEP 5: Compute absolute error BETWEEN:
-            theoretical P(B | A)
-            empirical P(B | A)
+        if A:
+            count_A += 1
+            if B:
+                count_AB += 1
 
-    RETURN:
+    empirical_P_A = count_A / N
+    empirical_P_B_given_A = count_AB / count_A
+
+    absolute_error = abs(empirical_P_B_given_A - P_B_given_A)
+
+    return (
         P_A,
         P_B,
         P_B_given_A,
@@ -48,146 +53,129 @@ def card_experiment():
         empirical_P_A,
         empirical_P_B_given_A,
         absolute_error
-    """
-
-    raise NotImplementedError
+    )
 
 
 # =========================================================
-# QUESTION 2 – Bernoulli
+# QUESTION 2 – Bernoulli (Light Bulb)
 # =========================================================
 
 def bernoulli_lightbulb(p=0.05):
-    """
-    STEP 1: Define Bernoulli(p) PMF:
-            p_X(x) = p^x (1-p)^(1-x)
 
-    STEP 2: Compute theoretical:
-            - P(X = 1)
-            - P(X = 0)
+    # Theoretical
+    theoretical_P_X_1 = p
+    theoretical_P_X_0 = 1 - p
 
-    STEP 3: Simulate 100,000 bulbs
-            using random_state=42.
+    # Simulation
+    np.random.seed(42)
+    samples = np.random.binomial(1, p, 100000)
+    empirical_P_X_1 = np.mean(samples)
 
-    STEP 4: Compute empirical:
-            - empirical P(X = 1)
+    absolute_error = abs(empirical_P_X_1 - theoretical_P_X_1)
 
-    STEP 5: Compute absolute error BETWEEN:
-            theoretical P(X = 1)
-            empirical P(X = 1)
-
-    RETURN:
+    return (
         theoretical_P_X_1,
         theoretical_P_X_0,
         empirical_P_X_1,
         absolute_error
-    """
-
-    raise NotImplementedError
+    )
 
 
 # =========================================================
-# QUESTION 3 – Binomial
+# QUESTION 3 – Binomial (10 Bulbs)
 # =========================================================
 
 def binomial_bulbs(n=10, p=0.05):
-    """
-    STEP 1: Define Binomial(n,p) PMF:
-            P(X=k) = C(n,k)p^k(1-p)^(n-k)
 
-    STEP 2: Compute theoretical:
-            - P(X = 0)
-            - P(X = 2)
-            - P(X ≥ 1)
+    # Theoretical probabilities
+    theoretical_P_0 = (1 - p) ** n
 
-    STEP 3: Simulate 100,000 inspections
-            using random_state=42.
+    theoretical_P_2 = (
+        math.comb(n, 2) *
+        (p ** 2) *
+        ((1 - p) ** (n - 2))
+    )
 
-    STEP 4: Compute empirical:
-            - empirical P(X ≥ 1)
+    theoretical_P_ge_1 = 1 - theoretical_P_0
 
-    STEP 5: Compute absolute error BETWEEN:
-            theoretical P(X ≥ 1)
-            empirical P(X ≥ 1)
+    # Simulation
+    np.random.seed(42)
+    samples = np.random.binomial(n, p, 100000)
+    empirical_P_ge_1 = np.mean(samples >= 1)
 
-    RETURN:
+    absolute_error = abs(empirical_P_ge_1 - theoretical_P_ge_1)
+
+    return (
         theoretical_P_0,
         theoretical_P_2,
         theoretical_P_ge_1,
         empirical_P_ge_1,
         absolute_error
-    """
-
-    raise NotImplementedError
+    )
 
 
 # =========================================================
-# QUESTION 4 – Geometric
+# QUESTION 4 – Geometric (Die Until 6)
 # =========================================================
 
 def geometric_die():
-    """
-    STEP 1: Let p = 1/6.
 
-    STEP 2: Define Geometric PMF:
-            P(X=k) = (5/6)^(k-1)*(1/6)
+    p = 1/6
 
-    STEP 3: Compute theoretical:
-            - P(X = 1)
-            - P(X = 3)
-            - P(X > 4)
+    # Theoretical probabilities
+    theoretical_P_1 = p
+    theoretical_P_3 = ((1 - p) ** 2) * p
+    theoretical_P_gt_4 = (1 - p) ** 4
 
-    STEP 4: Simulate 200,000 experiments
-            using random_state=42.
+    # Simulation
+    np.random.seed(42)
+    samples = np.random.geometric(p, 200000)
+    empirical_P_gt_4 = np.mean(samples > 4)
 
-    STEP 5: Compute empirical:
-            - empirical P(X > 4)
+    absolute_error = abs(empirical_P_gt_4 - theoretical_P_gt_4)
 
-    STEP 6: Compute absolute error BETWEEN:
-            theoretical P(X > 4)
-            empirical P(X > 4)
-
-    RETURN:
+    return (
         theoretical_P_1,
         theoretical_P_3,
         theoretical_P_gt_4,
         empirical_P_gt_4,
         absolute_error
-    """
-
-    raise NotImplementedError
+    )
 
 
 # =========================================================
-# QUESTION 5 – Poisson
+# QUESTION 5 – Poisson (Customers per Hour)
 # =========================================================
 
 def poisson_customers(lam=12):
-    """
-    STEP 1: Define Poisson PMF:
-            P(X=k) = e^(-λ) λ^k / k!
 
-    STEP 2: Compute theoretical:
-            - P(X = 0)
-            - P(X = 15)
-            - P(X ≥ 18)
+    # Theoretical probabilities
+    theoretical_P_0 = math.exp(-lam)
 
-    STEP 3: Simulate 100,000 hours
-            using random_state=42.
+    theoretical_P_15 = (
+        math.exp(-lam) *
+        (lam ** 15) /
+        math.factorial(15)
+    )
 
-    STEP 4: Compute empirical:
-            - empirical P(X ≥ 18)
+    theoretical_P_ge_18 = 1 - sum(
+        math.exp(-lam) *
+        (lam ** k) /
+        math.factorial(k)
+        for k in range(18)
+    )
 
-    STEP 5: Compute absolute error BETWEEN:
-            theoretical P(X ≥ 18)
-            empirical P(X ≥ 18)
+    # Simulation
+    np.random.seed(42)
+    samples = np.random.poisson(lam, 100000)
+    empirical_P_ge_18 = np.mean(samples >= 18)
 
-    RETURN:
+    absolute_error = abs(empirical_P_ge_18 - theoretical_P_ge_18)
+
+    return (
         theoretical_P_0,
         theoretical_P_15,
         theoretical_P_ge_18,
         empirical_P_ge_18,
         absolute_error
-    """
-
-    raise NotImplementedError
+    )
